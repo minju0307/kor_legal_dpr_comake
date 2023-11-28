@@ -8,6 +8,7 @@ final_lawberta/
 continual_roberta/
 best_version/
 last_version/
+__pycache__
 
 *.pt
 *.index
