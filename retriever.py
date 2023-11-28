@@ -72,10 +72,10 @@ if __name__ == "__main__":
         "lr": 1e-5,
         "betas": (0.9, 0.99),
         "num_warmup_steps" : 1000,
-        "num_training_steps": 2670,
+        "num_training_steps": 10000,
         "output_path": 'legal_dpr.index',
         "test_set": 'dataset/test_with_id.csv',
-        'top_k': 3
+        'top_k': 10
     }
 
     '''모델 로드하기 '''

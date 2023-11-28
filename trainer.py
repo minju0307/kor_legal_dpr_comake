@@ -64,9 +64,6 @@ class Trainer:
             num_workers=2,
         )
 
-        # self.train_loader, self.valid_loader, self.model, self.optimizer = \
-        # accelerator.prepare(self.train_loader, self.valid_loader, self.model, self.optimizer)
-
         self.scheduler = transformers.get_linear_schedule_with_warmup(
             self.optimizer, num_warmup_steps, num_training_steps
         )
@@ -89,16 +86,13 @@ class Trainer:
         pred : bsz x bsz 또는 bsz x bsz*2의 logit 값을 가짐. 후자는 hard negative를 포함하는 경우.
         """
         bsz = pred.size(0)
-        target = torch.arange(bsz).to(self.device)  # 주대각선이 answer
+        target = torch.arange(bsz).to(self.device) 
         return torch.nn.functional.cross_entropy(pred, target)
 
     def batch_acc(self, pred: torch.FloatTensor):
         """batch 내의 accuracy를 계산합니다."""
         bsz = pred.size(0)
-        target = torch.arange(bsz)  # 주대각선이 answer
-        # print(target)
-        # print(torch.sort(pred, descending=True)[1])
-        # print(pred.detach().cpu().max(1).indices)
+        target = torch.arange(bsz)  
         return (pred.detach().cpu().max(1).indices == target).sum().float() / bsz
 
     def fit(self):
@@ -151,12 +145,7 @@ class Trainer:
                 
                 log = {
                     "epoch": ep,
-                    # "step": step,
-                    # "global_step": global_step_cnt,
                     "train_step_loss": loss.cpu().item(),
-                    # "current_lr": float(
-                    #     self.scheduler.get_last_lr()[0]
-                    # ),  # parameter group 1개이므로
                     "step_acc": acc,
                 }
                 
@@ -222,7 +211,6 @@ class Trainer:
         self.optimizer.load_state_dict(training_state["optimizer_state"])
         self.scheduler.load_state_dict(training_state["scheduler_state"])
         self.start_ep = training_state["epoch"]
-        # self.start_step = training_state["step"]
         logger.debug(
             f"resume training from epoch {self.start_ep} / step {self.start_step}"
         )
@@ -238,13 +226,13 @@ if __name__ == "__main__":
         device=device,
         train_dataset=train_dataset,
         valid_dataset=valid_dataset,
-        num_epoch=10,
-        batch_size=8,
+        num_epoch=3,
+        batch_size=16,
         lr=1e-5,
         betas=(0.9, 0.99),
         num_warmup_steps=1000,
-        num_training_steps=2670,
-        valid_every=267,
+        num_training_steps=10000,
+        valid_every=250,
         best_val_ckpt_path="legal_dpr.pt",
     )
     # my_trainer.load_training_state()
